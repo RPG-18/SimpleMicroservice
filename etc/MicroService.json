@@ -1,0 +1,10 @@
+{
+  "address": "amqp://guest:guest@localhost/",
+  "local_storage" : "/home/dmitry/tmp/micro_service",
+  "source":{
+    "queue": "micro_service"
+  },
+  "destination":{
+    "queue": "user_top"
+  }
+}
