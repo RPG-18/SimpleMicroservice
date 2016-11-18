@@ -11,6 +11,13 @@ Player::Player()
 {
 }
 
+Player::Player(uint64_t id, const std::string& name)
+    : id(id)
+    , name(name)
+    , points(0)
+{
+}
+
 Player::Player(const DataBase::ByteArray &data)
 {
 //todo выпилить stringstream для оптимизации

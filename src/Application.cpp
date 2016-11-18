@@ -66,7 +66,7 @@ bool Application::onMinute()
 void Application::calculateRating()
 {
     //todo прикрутить Integer Sort из Boost, для поразрядной сортировки
-    std::sort(m_players.begin(), m_players.end(), [](const Player *a, const Player *b)
+    std::sort(m_players.begin(), m_players.end(), [](auto& a, auto& b)
     {
         return a->points > b->points;
     });
@@ -106,10 +106,10 @@ void Application::sendRating()
 
 void Application::cleanRating()
 {
-    for(auto player: m_players)
+    for(auto& player: m_players)
     {
         player->points = 0;
-        updatePlayerInBD(player);
+        updatePlayerInBD(player.get());
     }
 }
 
@@ -200,12 +200,10 @@ void Application::onPlayerRegistered(const JValue &params)
     auto obj = params.GetObject();
     const uint64_t playerId = obj["id"].GetUint64();
     if (!isRegistred(playerId)) {
-        auto player = new Player;
-        player->id = playerId;
-        player->name = obj["name"].GetString();
-        m_players.push_back(player);
-        m_id2player[playerId] = player;
-        updatePlayerInBD(player);
+        m_players.emplace_back(new Player(playerId, obj["name"].GetString()));
+        auto& player = m_players.back();
+        m_id2player[playerId] = player.get();
+        updatePlayerInBD(player.get());
     }
 }
 
@@ -248,12 +246,9 @@ void Application::updatePlayerInBD(const Player *player)
 
 void Application::freeMemPlayers()
 {
-    for (auto iter = m_id2player.begin();
-         iter != m_id2player.cend();
-         ++iter) {
-        delete iter->second;
-    }
+    // This function calls, currently from the dtor and now it can be safelly removed
     m_id2player.clear();
+    m_players.clear();
 }
 
 bool Application::isRegistred(uint64_t userId) const noexcept
@@ -267,9 +262,9 @@ void Application::loadFromLocalStorage()
     auto iter = snapshot.iterator();
     iter.toFirst();
     while (iter.isValid()) {
-        auto player = new Player(iter.value());
-        m_id2player[player->id] = player;
-        m_players.push_back(player);
+        m_players.emplace_back(new Player(iter.value()));
+        auto& player = m_players.back();
+        m_id2player[player->id] = player.get();
         iter.next();
     }
 }
