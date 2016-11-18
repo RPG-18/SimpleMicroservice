@@ -11,6 +11,7 @@ namespace MicroService
 struct Player
 {
     Player();
+    Player(uint64_t id, const std::string& name);
 
     /*!
      * deserialize

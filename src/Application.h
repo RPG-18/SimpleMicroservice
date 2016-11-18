@@ -80,7 +80,7 @@ private:
     std::unique_ptr<DataBase::DataBase> m_localStorage;
     std::unique_ptr<AMQP::TcpChannel> m_channel;
     ProcessingHadlers m_handlers;
-    std::vector<Player *> m_players;
+    std::vector<std::unique_ptr<Player>> m_players;
     std::unordered_map<uint64_t, Player *> m_id2player;
 };
 
